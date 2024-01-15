@@ -16,7 +16,8 @@ class PepSpider(scrapy.Spider):
         table_body = section_tag.css('tbody')
         for row in table_body.css('tr'):
             pep_link = urljoin(
-                self.start_urls, row.css('td:nth-child(3) a::attr(href)')
+                self.start_urls[0],
+                row.css('a::attr(href)').get()
             )
             yield response.follow(pep_link, callback=self.parse_pep)
 
@@ -24,9 +25,10 @@ class PepSpider(scrapy.Spider):
         raw_string = response.css('h1.page-title::text').get()
         group_string = re.search(r'^PEP (.*\d) . (.*)', raw_string)
         info_block = response.css('dl.rfc2822')
+        status = info_block.css('dt:contains("Status") + dd abbr::text').get()
         date = {
-            'name': group_string[1],
-            'number': group_string[0],
-            'status': info_block.css('dd:nth-child(4) abbr::text').get()
+            'name': group_string[2],
+            'number': group_string[1],
+            'status': status
         }
         yield PepParseItem(date)
