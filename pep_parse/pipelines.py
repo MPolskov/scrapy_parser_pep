@@ -1,9 +1,12 @@
+import os
 import csv
 from collections import defaultdict
 import datetime as dt
 
+from .settings import BASE_DIR
 
-class PepPipeline:
+
+class PepParsePipeline:
 
     def open_spider(self, spider):
         self.status_count = defaultdict(int)
@@ -15,7 +18,11 @@ class PepPipeline:
     def close_spider(self, spider):
         pep_count = sum(self.status_count.values())
         date_time_now = dt.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
-        filename = f'results/status_summary_{date_time_now}.csv'
+        filename = os.path.join(
+            BASE_DIR,
+            'results',
+            f'status_summary_{date_time_now}.csv'
+        )
         with open(filename, 'w', newline='') as csvfile:
             pep_writer = csv.writer(csvfile)
             pep_writer.writerow(['Статус', 'Количество'])
