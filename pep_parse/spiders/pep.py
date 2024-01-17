@@ -1,15 +1,20 @@
-import re
-
-import scrapy
 from urllib.parse import urljoin
 
+import scrapy
+
+
 from pep_parse.items import PepParseItem
+from pep_parse.settings import (
+    PEP_NAME,
+    PEP_DOMAINS,
+    PEP_URLS
+)
 
 
 class PepSpider(scrapy.Spider):
-    name = 'pep'
-    allowed_domains = ['peps.python.org']
-    start_urls = ['https://peps.python.org/']
+    name = PEP_NAME
+    allowed_domains = PEP_DOMAINS
+    start_urls = PEP_URLS
 
     def parse(self, response):
         section_tag = response.css('section#numerical-index')
@@ -22,13 +27,14 @@ class PepSpider(scrapy.Spider):
             yield response.follow(pep_link, callback=self.parse_pep)
 
     def parse_pep(self, response):
-        raw_string = response.css('h1.page-title::text').get()
-        group_string = re.search(r'^PEP (.*\d) . (.*)', raw_string)
+        num_and_name = (
+            response.css('h1.page-title::text').re(r'^PEP (.*\d) . (.*)')
+        )
         info_block = response.css('dl.rfc2822')
         status = info_block.css('dt:contains("Status") + dd abbr::text').get()
         date = {
-            'name': group_string[2],
-            'number': group_string[1],
+            'name': num_and_name[1],
+            'number': num_and_name[0],
             'status': status
         }
         yield PepParseItem(date)

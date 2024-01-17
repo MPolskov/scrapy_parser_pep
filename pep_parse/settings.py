@@ -20,3 +20,8 @@ FEEDS = {
         'overwrite': True
     },
 }
+
+# Spider pep.py
+PEP_NAME = 'pep'
+PEP_DOMAINS = ['peps.python.org']
+PEP_URLS = ['https://peps.python.org/']
