@@ -44,7 +44,7 @@ python -m pip install -r requirements.txt
 scrapy crawl pep
 ```
 ## Пример результата:
-* pep_ДатаВремя.csv - перечень всех Pep.
+* pep_ДатаВремя.csv:
 ```
 number,name,status
 1,PEP Purpose and Guidelines,Active
